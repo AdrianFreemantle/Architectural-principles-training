@@ -1,1 +1,0 @@
-﻿<%@ ServiceHost Language="C#" Debug="true" Service="AsbaBank.ApplicationService.Wcf.CommandHandlerService" CodeBehind="CommandHandlerService.svc.cs" %>
