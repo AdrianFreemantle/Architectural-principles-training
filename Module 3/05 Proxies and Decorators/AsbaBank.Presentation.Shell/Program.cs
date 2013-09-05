@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Data.Entity;
 using System.Linq;
 using System.Threading;
 using AsbaBank.ApplicationService;
 using AsbaBank.Core;
 using AsbaBank.Core.Commands;
+using AsbaBank.Domain.Models;
 using AsbaBank.Infrastructure;
 using AsbaBank.Infrastructure.CommandScripts;
 using AsbaBank.Infrastructure.Logging;
@@ -20,7 +22,17 @@ namespace AsbaBank.Presentation.Shell
         {
             IntialSetup();
 
-            Environment.SetCurrentUserRole(UserRole.Guest);
+            IQueryable<Account> accounts = Environment.GetEntityFrameworkQuery().Query<Account>();
+
+            var query = accounts.Where(a => a.Id > 0)
+                .Include(a => a.Client)
+                .Include("Client.Accounts");
+
+            var result = query.ToList();
+
+            var b = result.Count();
+
+            Environment.SetCurrentUserRole(UserRole.Administrator);
 
             while (true)
             {

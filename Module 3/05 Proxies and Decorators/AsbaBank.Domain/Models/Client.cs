@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 using AsbaBank.Core;
@@ -13,6 +14,8 @@ namespace AsbaBank.Domain.Models
         public virtual string Surname { get; protected set; }
         public virtual string PhoneNumber { get; protected set; }
         public virtual Address Address { get; protected set; }
+
+        public virtual ICollection<Account> Accounts { get; protected set; }
 
         protected Client()
         {

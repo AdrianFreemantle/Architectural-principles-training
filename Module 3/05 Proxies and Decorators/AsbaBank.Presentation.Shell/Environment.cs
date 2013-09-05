@@ -125,7 +125,7 @@ namespace AsbaBank.Presentation.Shell
             return new ClientQueries(efQuery, efQuery);
         }
 
-        private static EntityFrameworkQuery GetEntityFrameworkQuery()
+        public static EntityFrameworkQuery GetEntityFrameworkQuery()
         {
             return new EntityFrameworkQuery(new ContextFactory<AsbaContext>("AsbaBank"));
         }

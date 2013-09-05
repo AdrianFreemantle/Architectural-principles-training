@@ -1,0 +1,37 @@
+﻿@model AsbaBank.Presentation.Mvc.Forms.AccountDebitForm
+
+@{
+    ViewBag.Title = "Debit Account";
+}
+
+<h2>Debit Account</h2>
+
+@using (Html.BeginForm()) {
+    @Html.ValidationSummary(true)
+
+    <fieldset>
+        <legend>Debit Account</legend>
+
+        @Html.HiddenFor(model => model.AccountId)
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.DebitAmount) 
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.DebitAmount)
+            @Html.ValidationMessageFor(model => model.DebitAmount)
+        </div>
+
+        <p>
+            <input type="submit" value="Debit" />
+        </p>
+    </fieldset>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

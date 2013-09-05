@@ -82,6 +82,10 @@
       <Project>{6DF08D72-9B84-4789-BA30-1DC1439F0EBD}</Project>
       <Name>AsbaBank.DataModel</Name>
     </ProjectReference>
+    <ProjectReference Include="..\AsbaBank.Domain\AsbaBank.Domain.csproj">
+      <Project>{9B6645FF-6E28-4F3E-A007-7ACA766BD366}</Project>
+      <Name>AsbaBank.Domain</Name>
+    </ProjectReference>
     <ProjectReference Include="..\AsbaBank.Infrastructure.EntityFramework\AsbaBank.Infrastructure.EntityFramework.csproj">
       <Project>{D91479BE-75B4-40AA-B48C-95D42ED834A7}</Project>
       <Name>AsbaBank.Infrastructure.EntityFramework</Name>

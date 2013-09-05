@@ -1,0 +1,120 @@
+﻿@model AsbaBank.Presentation.Mvc.ViewModels.AccountViewModel
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div class="well">
+    <dl class="dl-horizontal">
+        <dt>
+            Account Number
+        </dt>
+        <dd>
+            @Model.AccountNumber
+        </dd>
+        
+        <dt>
+            Client
+        </dt>
+        <dd>
+            @Model.ClientName
+        </dd>       
+
+        <dt>
+            Balance
+        </dt>
+        <dd>
+            @Model.Balance
+        </dd>
+
+        <dt>
+            Status
+        </dt>
+        <dd>
+            @Model.Status
+        </dd>
+    </dl>
+</div>
+@if (!Model.Closed)
+{ 
+    <form action="@Url.Action("Debit", new { id=Model.Id })" method="GET" style="display: inline">
+        <input type="submit" value="Debit Account" class="btn btn-primary">
+    </form>
+    <form action="@Url.Action("Credit", new { id=Model.Id })" method="GET" style="display: inline">
+        <input type="submit" value="Credit Account" class="btn btn-primary">
+    </form>
+    <form action="@Url.Action("IssueBankCard", new { id=Model.Id })" method="POST" style="display: inline">
+        <input type="submit" value="Issue Bank Card" class="btn btn-primary">
+    </form>
+    <form action="@Url.Action("StopBankCard", new { id=Model.Id })" method="POST" style="display: inline">
+        <input type="submit" value="Stop Bank Card" class="btn btn-primary">
+    </form>
+    <form action="@Url.Action("Close", new { id=Model.Id })" method="POST" style="display: inline">
+        <input type="submit" value="Close Account" class="btn btn-primary">
+    </form>
+}
+ 
+<h2>Bank Cards</h2>
+
+<div class="well">
+    <table class="table table-bordered table-striped">
+        <tr>
+            <th>
+                Id
+            </th>
+            <th>
+                Date Issued
+            </th>
+            <th>
+                Status
+            </th>
+        </tr>
+
+        @foreach (var item in Model.BankCards)
+        {
+            <tr>
+                <td>
+                    @item.Id
+                </td>
+                <td>
+                    @item.Issued.ToString("yyyy/MM/dd H:mm:ss")
+                </td>
+                <td>
+                    @(item.Disabled ? "Stopped" : "Active")
+                </td>
+            </tr>
+        }
+    </table>
+</div>
+
+<h2>Transaction History</h2>
+
+<div class="well">
+    <table class="table table-bordered table-striped">
+        <tr>
+            <th>
+                Date
+            </th>
+            <th>
+                Amount
+            </th>
+        </tr>
+
+        @foreach (var item in Model.Ledger)
+        {
+            <tr>
+                <td>
+                    @item.Date.ToString("yyyy/MM/dd H:mm:ss")
+                </td>
+                <td>
+                    @item.Amount.ToString("C")
+                </td>
+            </tr>
+        }
+    </table>
+</div>
+<p>
+    @Html.ActionLink("Back to List", "Index")
+</p>

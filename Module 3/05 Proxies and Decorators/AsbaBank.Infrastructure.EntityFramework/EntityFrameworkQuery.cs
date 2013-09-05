@@ -15,12 +15,12 @@ namespace AsbaBank.Infrastructure.EntityFramework
         public EntityFrameworkQuery(IContextFactory contextFactory)
         {
             context = contextFactory.GetContext();
-            DisableLazyLoading();
+            //DisableLazyLoading();
         }
 
         public IQueryable<TEntity> Query<TEntity>() where TEntity : class
         {
-            return context.Set<TEntity>().AsNoTracking();
+            return context.Set<TEntity>();
         }
 
         public void EnableLazyLoading()
