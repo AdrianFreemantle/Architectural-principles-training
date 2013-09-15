@@ -1,36 +1,81 @@
-﻿namespace Entities
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Text.RegularExpressions;
+
+namespace Entities
 {
     class Program
     {
         static void Main(string[] args)
         {
-            var name1 = new PersonName("Adrian", "Freemantle");
-            var name2 = new PersonName("Peter", "Jones");
+            Eventer eventer = new Eventer();
 
-            var id1 = new PersonId(12345);
-            var id2 = new PersonId(99999);
 
-            var p1 = new Person(id1, name1);
-            var p2 = new Person(id1, name2);
-            var p3 = new Person(id2, name1);
-
-            bool personsAreSame = false;
-
-            personsAreSame = p1 == p2;
-            personsAreSame = p1.Equals(p2);
-            personsAreSame = ReferenceEquals(p1, p2);
-
-            personsAreSame = p1 == p3;
-            personsAreSame = p1.Equals(p3);
-            personsAreSame = ReferenceEquals(p1, p3);
         }
     }
 
-    public class PersonSnapshot : IMemento
+    public class SomeEvent : DomainEvent
     {
-        public IHaveIdentity Identity { get; set; }
-        public string FirstName { get; set; }
-        public string Surname { get; set; }
+    }
+
+    public class OtherEvent : DomainEvent
+    {
+        
+    }
+
+
+    public class Eventer
+    {
+        void When(SomeEvent e)
+        {
+            Console.WriteLine("SomeEvent");
+        }
+
+        void When(OtherEvent e)
+        {
+            Console.WriteLine("OtherEvent");
+        }
+    }
+
+    public class EventHandlers
+    {
+        public Dictionary<Type, Action<object>> GetEventHandlers(object target)
+        {
+            Type EventBaseType = typeof (IDomainEvent);
+
+            var eventHandlers = new Dictionary<Type, Action<object>>();
+
+            var targetType = target.GetType();
+
+            var methodsToMatch = targetType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+
+            var matchedMethods = (from method in methodsToMatch
+                                 let parameters = method.GetParameters()
+                                 where
+                                    method.Name.Equals("When", StringComparison.InvariantCulture) &&
+                                    parameters.Length == 1 &&
+                                    EventBaseType.IsAssignableFrom(parameters[0].ParameterType)
+                                 select
+                                    new { MethodInfo = method, FirstParameter = method.GetParameters()[0] });
+
+            foreach (var method in matchedMethods)
+            {
+                var methodCopy = method.MethodInfo;
+                Type firstParameterType = methodCopy.GetParameters().First().ParameterType;
+                var invokeAction = InvokeAction(methodCopy);
+                eventHandlers.Add(firstParameterType, invokeAction);
+            }
+
+            return eventHandlers;
+        }
+
+        private Action<object> InvokeAction(MethodInfo methodCopy)
+        {
+            Action<object> invokeAction = (e) => methodCopy.Invoke(this, new[] {e});
+            return invokeAction;
+        }
     }
 
 }

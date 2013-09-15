@@ -1,77 +1,28 @@
-﻿using System;
+﻿using System.Diagnostics;
 
 namespace Entities
 {
-    public abstract class Entity : IAmRestorable
+    [DebuggerStepThrough]
+    public class Entity : EntityBase
     {
-        public IHaveIdentity Identity { get; protected set; }
+        private IAggregate parent;
 
-        public override int GetHashCode()
+        protected Entity(IAggregate parent, IHaveIdentity identity)
+            : base(identity)
         {
-            return Identity.GetHashCode();
+            SetParent(parent);
         }
 
-        public override bool Equals(object obj)
+        private void SetParent(IAggregate aggregate)
         {
-            return Equals(obj as Entity);
+            parent = aggregate;
+            parent.RegisterOwnedEntity(this);
         }
 
-        public virtual bool Equals(Entity other)
+        protected override void SaveEvent(IDomainEvent @event)
         {
-            if (null != other && other.GetType() == GetType())
-            {
-                return other.Identity.Equals(Identity);
-            }
-
-            return false;
-        }
-
-        public static bool operator ==(Entity left, Entity right)
-        {
-            return Equals(left, right);
-        }
-
-        public static bool operator !=(Entity left, Entity right)
-        {
-            return !Equals(left, right);
-        }
-
-        IMemento IAmRestorable.GetSnapshot()
-        {
-            var snapshot = GetSnapshot();
-
-            if (snapshot != null)
-            {
-                snapshot.Identity = Identity;
-            }
-
-            return snapshot;
-        }
-
-        void IAmRestorable.RestoreSnapshot(IMemento memento)
-        {
-            if (memento == null)
-            {
-                return;
-            }
-
-            RestoreSnapshot(memento);
-            Identity = memento.Identity;
-        }
-
-        protected virtual IMemento GetSnapshot()
-        {
-            return null;
-        }
-
-        protected virtual void RestoreSnapshot(IMemento memento)
-        {
-            throw new NotImplementedException("The entity does not currently support restoring from a snapshot");
-        }
-
-        public override string ToString()
-        {
-            return Identity.ToString();
+            @event.Entity = Identity;
+            parent.SaveEvent(@event);
         }
     }
 }

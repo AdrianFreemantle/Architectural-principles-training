@@ -1,17 +1,27 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization;
 
 namespace Entities
 {
     [DataContract]
+    [DebuggerStepThrough]
     public abstract class Identity : IEquatable<Identity>, IHaveIdentity
     {
         private static readonly Type[] SupportTypes = {typeof(int), typeof(long), typeof(uint), typeof(ulong), typeof(Guid), typeof(string)};
-
+        
+        [DataMember]
         protected dynamic Id { get; private set; }
 
-        public abstract string GetTag();
+        public virtual string GetTag()
+        {
+            var typeName = GetType().Name;
+            
+            return typeName.EndsWith("Id") 
+                ? typeName.Substring(0, typeName.Length - 2) 
+                : typeName;
+        }
                
         protected Identity(dynamic id)
         {           
