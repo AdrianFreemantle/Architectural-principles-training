@@ -133,7 +133,6 @@ namespace Shell
         }
     }
 
-
     public class Ledger : Entity
     {
         readonly List<decimal> transactions;
@@ -228,9 +227,7 @@ namespace Shell
 
     }
 
-
-
-    public class AccountId : Identity
+    public class AccountId : Identity<string>
     {
         public AccountId(string id)
             : base(id)
@@ -238,7 +235,7 @@ namespace Shell
         }
     }
 
-    public class LedgerId : Identity
+    public class LedgerId : Identity<Guid>
     {
         public LedgerId(Guid id)
             : base(id)

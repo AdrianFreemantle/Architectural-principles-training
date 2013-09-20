@@ -3,16 +3,18 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization;
 
-namespace Entities
+namespace Aggregates
 {
     [DataContract]
     [DebuggerStepThrough]
-    public abstract class Identity : IEquatable<Identity>, IHaveIdentity
+    public abstract class Identity<T> : IEquatable<Identity<T>>, IHaveIdentity
     {
+        // ReSharper disable StaticFieldInGenericType
         private static readonly Type[] SupportTypes = {typeof(int), typeof(long), typeof(uint), typeof(ulong), typeof(Guid), typeof(string)};
+        // ReSharper restore StaticFieldInGenericType
         
         [DataMember]
-        protected dynamic Id { get; private set; }
+        protected T Id { get; private set; }
 
         public virtual string GetTag()
         {
@@ -23,7 +25,7 @@ namespace Entities
                 : typeName;
         }
                
-        protected Identity(dynamic id)
+        protected Identity(T id)
         {           
             VerifyIdentityType(id);
             Id = id;
@@ -39,12 +41,12 @@ namespace Entities
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
 
-            var identity = obj as Identity;
+            var identity = obj as Identity<T>;
 
             return identity != null && Equals(identity);
         }
 
-        public bool Equals(Identity other)
+        public bool Equals(Identity<T> other)
         {
             if (other != null)
             {
@@ -83,22 +85,15 @@ namespace Entities
 
         public virtual bool IsEmpty()
         {
-            var type = Id.GetType();
-
-            if (type == typeof (string))
-            {
-                return Id == string.Empty;
-            }
-
-            return Activator.CreateInstance(type) == Id;
+            return Id.Equals(default(T));
         }
 
-        public static bool operator ==(Identity left, Identity right)
+        public static bool operator ==(Identity<T> left, Identity<T> right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(Identity left, Identity right)
+        public static bool operator !=(Identity<T> left, Identity<T> right)
         {
             return !Equals(left, right);
         }
