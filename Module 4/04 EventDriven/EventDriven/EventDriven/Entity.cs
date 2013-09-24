@@ -2,24 +2,24 @@
 {
     public class Entity : EntityBase
     {
-        private IAggregate parent;
+        protected Aggregate Parent;
 
-        protected Entity(IAggregate parent, IHaveIdentity identity)
+        protected Entity(Aggregate parent, IHaveIdentity identity)
             : base(identity)
         {
             SetParent(parent);
         }
 
-        private void SetParent(IAggregate aggregate)
+        private void SetParent(Aggregate aggregate)
         {
-            parent = aggregate;
-            parent.RegisterOwnedEntity(this);
+            Parent = aggregate;
+            Parent.RegisterOwnedEntity(this);
         }
 
-        protected override void SaveEvent(IDomainEvent @event)
+        internal override void SaveEvent(DomainEvent @event)
         {
-            @event.Entity = Identity;
-            parent.SaveEvent(@event);
+            @event.SetEntityDetails(this);
+            Parent.SaveEvent(@event);
         }
     }
 }

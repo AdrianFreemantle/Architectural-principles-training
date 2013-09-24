@@ -40,22 +40,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActivatorHelper.cs" />
     <Compile Include="Aggregate.cs" />
     <Compile Include="DomainEvent.cs" />
     <Compile Include="Entity.cs" />
     <Compile Include="EntityBase.cs" />
+    <Compile Include="EventDoesNotMutateStateAttribute.cs" />
+    <Compile Include="EventHandlerInvocationException.cs" />
+    <Compile Include="EventHandlerNotFoundException.cs" />
     <Compile Include="IAggregate.cs" />
     <Compile Include="IAmRestorable.cs" />
     <Compile Include="Identity.cs" />
-    <Compile Include="IDomainEvent.cs" />
     <Compile Include="IEntity.cs" />
     <Compile Include="IHaveIdentity.cs" />
     <Compile Include="IMemento.cs" />
-    <Compile Include="ObjectCopier.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="Memento.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TypedAggregate.cs" />
-    <Compile Include="TypedEntity.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

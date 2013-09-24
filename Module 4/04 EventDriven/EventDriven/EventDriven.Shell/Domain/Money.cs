@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace EventDriven.Shell.Domain
 {
     [Serializable]
+    [DebuggerStepThrough]
     public struct Money 
     {
         private readonly decimal amount;
@@ -35,9 +37,9 @@ namespace EventDriven.Shell.Domain
             return new Money(left.amount + right.amount);
         }
 
-        public static Money operator -(Money left, Money right)
+        public static decimal operator -(Money left, Money right)
         {
-            return new Money(left.amount - right.amount);
+            return left.amount - right.amount;
         }
 
         public override string ToString()

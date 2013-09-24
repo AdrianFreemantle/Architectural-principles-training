@@ -1,53 +1,26 @@
-﻿using System.Linq;
+﻿using EventDriven.Shell.Domain.Events;
 
 namespace EventDriven.Shell.Domain
 {
-    public class AccountDebited : DomainEvent
+    public partial class Account : Entity
     {
-        public decimal Amount { get; protected set; } 
-
-        public AccountDebited(decimal amount)
+        protected Account(Portfolio portfolio, AccountId identity)
+            : base(portfolio, identity)
         {
-            Amount = amount;
         }
-    }
 
-    public class AccountCredited : DomainEvent
-    {
-        public decimal Amount { get; protected set; }
-
-        public AccountCredited(decimal amount)
+        public static Account OpenAccount(Portfolio portfolio, AccountType accountType)
         {
-            Amount = amount;
-        }
-    }
-
-    public class AccountHasInsufficientFundsForDebit : DomainEvent
-    {
-        public decimal DebitAmount { get; protected set; }
-        public decimal CurrentBalance { get; protected set; }
-
-        public AccountHasInsufficientFundsForDebit(decimal debitAmount, decimal currentBalance)
-        {
-            DebitAmount = debitAmount;
-            CurrentBalance = currentBalance;
-        }
-    }
-
-    public class Account : TypedEntity<AccountState>
-    {
-        public Account(Portfolio portfolio, AccountType accountType)
-            : base(portfolio, new AccountId((int)accountType))
-        {
+            var account = new Account(portfolio, new AccountId(accountType));            
+            return account; 
         }
 
         public void Debit(Money amount)
         {
-            var currentBalance = Balance();
-
-            if ((currentBalance - amount) < 0)
+            if (balance - amount < 0)
             {
-                RaiseEvent(new AccountHasInsufficientFundsForDebit(amount, currentBalance));
+                RaiseEvent(new AccountHadInsufficientFundsForDebit(amount, balance));
+                return;
             }
 
             RaiseEvent(new AccountDebited(amount));
@@ -58,14 +31,9 @@ namespace EventDriven.Shell.Domain
             RaiseEvent(new AccountCredited(amount));
         }
 
-        public decimal Balance()
+        public Money CurrentBalance()
         {
-            return State.Transactions.Sum(transaction => transaction);
-        }
-
-        protected override IMemento GetSnapshot()
-        {
-            return ObjectCopier.Clone(State);
+            return balance;
         }
     }
 }

@@ -42,16 +42,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Domain\Account.cs" />
+    <Compile Include="Domain\AccountOpened.cs" />
+    <Compile Include="Domain\Snapshots\AccountSnapshot.cs" />
+    <Compile Include="Domain\Events\AccountCredited.cs" />
+    <Compile Include="Domain\Events\AccountDebited.cs" />
+    <Compile Include="Domain\Events\AccountHadInsufficientFundsForDebit.cs" />
     <Compile Include="Domain\AccountId.cs" />
-    <Compile Include="Domain\AccountState.cs" />
+    <Compile Include="Domain\Account.State.cs" />
     <Compile Include="Domain\AccountType.cs" />
     <Compile Include="Domain\Money.cs" />
     <Compile Include="Domain\Portfolio.cs" />
+    <Compile Include="Domain\Events\PortfolioClosed.cs" />
+    <Compile Include="Domain\Events\PortfolioHadInsufficientFundsForDebit.cs" />
     <Compile Include="Domain\PortfolioId.cs" />
-    <Compile Include="Domain\PortfolioSnapshot.cs" />
-    <Compile Include="Domain\PortfolioState.cs" />
-    <Compile Include="Domain\Transaction.cs" />
-    <Compile Include="Domain\TransactionType.cs" />
+    <Compile Include="Domain\Portfolio.State.cs" />
+    <Compile Include="Domain\Events\PortfolioOpened.cs" />
+    <Compile Include="Domain\Snapshots\PortfolioMemento.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

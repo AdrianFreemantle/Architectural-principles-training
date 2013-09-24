@@ -4,10 +4,9 @@ namespace EventDriven
 {
     public interface IAggregate : IEntity
     {
-        IEnumerable<IDomainEvent> GetUncommittedEvents();
+        IEnumerable<DomainEvent> GetUncommittedEvents();
         void ClearUncommittedEvents();
         int GetVersion();
-        void LoadFromHistory(IEnumerable<IDomainEvent> domainEvents);
-        void RegisterOwnedEntity(IEntity entity);
+        void LoadFromHistory(IEnumerable<DomainEvent> domainEvents);
     }
 }

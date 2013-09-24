@@ -6,6 +6,7 @@ using System.Reflection;
 
 namespace EventDriven
 {
+    //[DebuggerStepThrough]
     public abstract class EntityBase : IEntity
     {
         public IHaveIdentity Identity { get; set; }
@@ -15,31 +16,47 @@ namespace EventDriven
         {
             Identity = identity;
             eventHandlers = new Dictionary<Type, Action<object>>();
+            ScanForEventHandlers();
+        }
+
+        private void ScanForEventHandlers()
+        {
             GetEventHandlers();
         }
 
-        protected virtual void RaiseEvent(IDomainEvent @event)  
+        protected virtual void RaiseEvent(DomainEvent @event)  
         {
             ApplyEvent(@event);
             SaveEvent(@event);
         }
 
-        void IEntity.ApplyEvent(IDomainEvent @event)
+        void IEntity.ApplyEvent(DomainEvent @event)
         {
             ApplyEvent(@event);
         }
 
-        protected virtual void ApplyEvent(IDomainEvent @event)
+        protected virtual void ApplyEvent(DomainEvent @event)
         {
-            eventHandlers[@event.GetType()].Invoke(@event);
+            try
+            {
+                var eventType = @event.GetType();
+                
+                if(eventType.GetCustomAttribute<EventDoesNotMutateStateAttribute>() == null)
+                {
+                    eventHandlers[eventType].Invoke(@event);
+                }
+            }
+            catch (TargetInvocationException ex)
+            {
+                throw new EventHandlerInvocationException(this, @event, ex);
+            }
+            catch (KeyNotFoundException)
+            {
+                throw new EventHandlerNotFoundException(this, @event);
+            }
         }
 
-        void IEntity.SaveEvent(IDomainEvent @event)
-        {
-            SaveEvent(@event);
-        }
-
-        protected abstract void SaveEvent(IDomainEvent @event);
+        internal abstract void SaveEvent(DomainEvent @event);
 
         public override int GetHashCode()
         {
@@ -111,7 +128,7 @@ namespace EventDriven
         [DebuggerStepThrough]
         protected virtual void GetEventHandlers()
         {
-            Type EventBaseType = typeof(IDomainEvent);
+            Type EventBaseType = typeof(DomainEvent);
 
             var targetType = GetType();
 
@@ -135,9 +152,10 @@ namespace EventDriven
             }
         }
 
+        [DebuggerStepThrough]
         private Action<object> InvokeAction(MethodInfo methodCopy)
         {
-            return e => methodCopy.Invoke(this, new[] {e});
+            return e => methodCopy.Invoke(this, new[] { e });
         }
     }
 }
