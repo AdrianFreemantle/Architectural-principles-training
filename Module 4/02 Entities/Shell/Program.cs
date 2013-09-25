@@ -11,8 +11,8 @@ namespace Shell
         static void Main(string[] args)
         {
             var id = Guid.NewGuid();
-            var ledger1 = new Account(new LedgerId(id));
-            var ledger2 = new Account(new LedgerId(id));
+            var ledger1 = new Account(new AccountId(id));
+            var ledger2 = new Account(new AccountId(id));
 
             ledger1.Credit(Money.Amount(50));
             ledger2.Credit(Money.Amount(10));

@@ -42,7 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Domain\Account.cs" />
-    <Compile Include="Domain\LedgerId.cs" />
+    <Compile Include="Domain\AccountId.cs" />
     <Compile Include="Domain\Money.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
