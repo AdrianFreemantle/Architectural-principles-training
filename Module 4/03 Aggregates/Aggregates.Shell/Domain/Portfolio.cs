@@ -1,30 +1,48 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Aggregates.Shell.Domain.Snapshots;
 
 namespace Aggregates.Shell.Domain
 {
-    public class Portfolio : TypedAggregate<PortfolioState>
+    public class Portfolio : Aggregate
     {
+        private bool isOpen;
+        private readonly HashSet<Account> accounts;
+
         private static readonly Money MinimumPortfolioBalance = Money.Amount(100);
 
-        public Portfolio(PortfolioId id) 
+        protected Portfolio(PortfolioId id) 
             : base(id)
         {
-            State.IsOpen = true;
+            accounts = new HashSet<Account>();
+            isOpen = true;
+        }
+
+        public static Portfolio Open(PortfolioId id, AccountType accountType, Money initialDeposit)
+        {
+            if (initialDeposit < MinimumPortfolioBalance)
+            {
+                throw new InvalidOperationException(String.Format("The intial deposit of {0} is lower than the require a minimum of {1}", initialDeposit, MinimumPortfolioBalance));
+            }
+
+            var portfolio = new Portfolio(id);
+            portfolio.OpenAccount(accountType);
+            portfolio.CreditAccount(accountType, initialDeposit);
+
+            return portfolio;
         }
 
         public void ClosePortfolio()
         {
-            State.IsOpen = false;
+            isOpen = false;
         }
 
         public void OpenAccount(AccountType accountType)
         {
             GuardPortfolioState();
             GuardAccountType(accountType);
-
-            RegisterOwnedEntity(new Account(accountType));
+            accounts.Add(new Account(this, new AccountId(accountType)));
         }
 
         public void DebitAccount(AccountType accountType, Money amount)
@@ -32,7 +50,7 @@ namespace Aggregates.Shell.Domain
             GuardPortfolioState();
             GuardPortfolioBalance(accountType, amount);
 
-            var account = GetEntity<Account>(new AccountId(accountType));
+            var account = Get<Account>(new AccountId(accountType));
             account.Debit(amount);
         }
 
@@ -40,13 +58,13 @@ namespace Aggregates.Shell.Domain
         {
             GuardPortfolioState();
 
-            var account = GetEntity<Account>(new AccountId(accountType));
+            var account = Get<Account>(new AccountId(accountType));
             account.Credit(amount);
         }
 
         public Money GetAccountBalance(AccountType accountType)
         {
-            var account = GetEntity<Account>(new AccountId(accountType));
+            var account = Get<Account>(new AccountId(accountType));
             return account.Balance();
         }
 
@@ -54,9 +72,9 @@ namespace Aggregates.Shell.Domain
         {
             Money balance = Money.Zero;
 
-            foreach (var account in Entities.Where(entity => entity is Account))
+            foreach (var account in accounts)
             {
-                balance += ((Account)account).Balance();
+                balance += account.Balance();
             }
 
             return balance;
@@ -68,14 +86,14 @@ namespace Aggregates.Shell.Domain
 
             if ((currentBalance - debitAmout) < MinimumPortfolioBalance)
             {
-                throw new InvalidOperationException(String.Format("Unable to withdraw {0} from account {1} on portfolio {2} as it would exceed the portfolio balance limit of {3}", 
-                    debitAmout, accountType, this.Identity.GetId(), MinimumPortfolioBalance));
+                throw new InvalidOperationException(String.Format("Unable to withdraw {0} from account {1} on portfolio {2} as it would exceed the portfolio balance limit of {3}",  
+                    debitAmout, accountType, Identity.GetId(), MinimumPortfolioBalance));
             }
         }
 
         private void GuardPortfolioState()
         {
-            if (!State.IsOpen)
+            if (!isOpen)
             {
                 throw new InvalidOperationException("Account is closed");
             }
@@ -93,8 +111,8 @@ namespace Aggregates.Shell.Domain
         {
             return new PortfolioSnapshot
             {
-                State = State,
-                Entities = new HashSet<IMemento>(Entities.Select(entity => entity.GetSnapshot()))
+                IsOpen = isOpen,
+                Accounts = accounts.Select(account => ((IEntity)account).GetSnapshot()).ToArray()
             };
         }
 
@@ -102,23 +120,11 @@ namespace Aggregates.Shell.Domain
         {
             var snapshot = (PortfolioSnapshot)memento;
 
-            State = snapshot.State;
+            isOpen = snapshot.IsOpen;
 
-            foreach (var entityMemento in snapshot.Entities)
+            foreach (var account in snapshot.Accounts.Select(s => RestoreEntity<Account>(s)))
             {
-                var identityType = entityMemento.Identity.GetType();
-
-                if (identityType == typeof (AccountId))
-                {
-                    var account = new Account(new AccountId(entityMemento.Identity.GetId()));
-                    ((IEntity)account).RestoreSnapshot(entityMemento);
-                    RegisterOwnedEntity(account);
-                }
-                else
-                {
-                    throw new InvalidOperationException(String.Format("Aggregate {0} with Id {1} does not know how to restore memento type {2} with id {3}", 
-                        GetType().FullName, Identity, entityMemento.GetType().FullName, entityMemento.Identity));
-                }
+                accounts.Add(account);
             }
         }
     }

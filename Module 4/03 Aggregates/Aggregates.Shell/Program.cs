@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Aggregates.Shell.Domain;
 
 namespace Aggregates.Shell
@@ -11,14 +7,11 @@ namespace Aggregates.Shell
     {
         static void Main(string[] args)
         {
-            var original = new Portfolio(new PortfolioId("1234567"));
-
-            original.OpenAccount(AccountType.Cheque);
-            original.OpenAccount(AccountType.Savings);
+            var original = Portfolio.Open(PortfolioId.GenerateId(), AccountType.Cheque, Money.Amount(100));
             original.CreditAccount(AccountType.Cheque, Money.Amount(50));
             var memento = ((IAggregate)original).GetSnapshot();
 
-            var copy = new Portfolio((PortfolioId)memento.Identity);
+            var copy = ActivatorHelper.CreateInstanceUsingNonPublicConstructor<Portfolio>(memento.Identity);
             ((IAggregate)copy).RestoreSnapshot(memento);
             copy.CreditAccount(AccountType.Cheque, Money.Amount(5));
 

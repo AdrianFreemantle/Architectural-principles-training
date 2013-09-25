@@ -13,12 +13,7 @@ namespace Aggregates
         {
         }
 
-        void IAggregate.RegisterOwnedEntity(IEntity entity)
-        {
-            RegisterOwnedEntity(entity);
-        }
-
-        protected virtual void RegisterOwnedEntity(IEntity entity)
+        internal virtual void RegisterOwnedEntity(IEntity entity)
         {
             if (entity.Identity.IsEmpty())
             {
@@ -33,15 +28,22 @@ namespace Aggregates
             Entities.Add(entity);
         }
 
-        protected TEntity GetEntity<TEntity>(IHaveIdentity entityId) where TEntity : IEntity
+        protected TEntity Get<TEntity>(IHaveIdentity entityId) where TEntity : IEntity
         {
-            var entity = Entities.FirstOrDefault(e => e.Identity.Equals(entityId));
+            var entity = Entities.SingleOrDefault(e => e.Identity.Equals(entityId));
 
             if (entity == null)
             {
-                throw new InvalidOperationException(String.Format("Entity with id of {0} could not be found on aggregate {1}", entityId, Identity));
+                throw new InvalidOperationException(String.Format("Entity {0} could not be found on aggregate {1}", entityId, Identity));
             }
 
+            return (TEntity)entity;
+        }
+
+        protected TEntity RestoreEntity<TEntity>(IMemento memento) where TEntity : class, IEntity
+        {
+            IEntity entity = ActivatorHelper.CreateInstanceUsingNonPublicConstructor<TEntity>(this, memento.Identity);
+            entity.RestoreSnapshot(memento);
             return (TEntity)entity;
         }
     }

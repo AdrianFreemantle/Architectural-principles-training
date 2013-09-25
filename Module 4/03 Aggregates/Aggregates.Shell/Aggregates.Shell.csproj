@@ -43,12 +43,11 @@
   <ItemGroup>
     <Compile Include="Domain\Account.cs" />
     <Compile Include="Domain\AccountId.cs" />
-    <Compile Include="Domain\AccountState.cs" />
+    <Compile Include="Domain\Snapshots\AccountSnapshot.cs" />
     <Compile Include="Domain\AccountType.cs" />
     <Compile Include="Domain\Portfolio.cs" />
     <Compile Include="Domain\PortfolioId.cs" />
-    <Compile Include="Domain\PortfolioSnapshot.cs" />
-    <Compile Include="Domain\PortfolioState.cs" />
+    <Compile Include="Domain\Snapshots\PortfolioSnapshot.cs" />
     <Compile Include="Domain\Money.cs" />
     <Compile Include="Domain\Transaction.cs" />
     <Compile Include="Domain\TransactionType.cs" />

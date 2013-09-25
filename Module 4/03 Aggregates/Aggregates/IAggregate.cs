@@ -4,6 +4,5 @@ namespace Aggregates
 {
     public interface IAggregate : IEntity
     {
-        void RegisterOwnedEntity(IEntity entity);
     }
 }

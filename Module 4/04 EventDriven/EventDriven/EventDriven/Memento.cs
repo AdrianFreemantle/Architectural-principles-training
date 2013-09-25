@@ -1,6 +1,6 @@
 ﻿namespace EventDriven
 {
-    public class Memento : IMemento
+    public abstract class Memento : IMemento
     {
         IHaveIdentity IMemento.Identity { get; set; }
     }

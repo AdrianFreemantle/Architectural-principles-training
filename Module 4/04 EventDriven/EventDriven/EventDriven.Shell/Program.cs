@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using EventDriven.Shell.Domain;
 
 namespace EventDriven.Shell
@@ -14,18 +10,26 @@ namespace EventDriven.Shell
         {
             try
             {
-                Portfolio portfolio = Portfolio.Create(AccountType.Cheque, Money.Amount(100));
-                portfolio.CreditAccount(AccountType.Cheque, Money.Amount(10));
+                Portfolio original = Portfolio.Open(PortfolioId.GenerateId(), AccountType.Cheque, Money.Amount(100));
+                original.CreditAccount(AccountType.Cheque, Money.Amount(50));
+                IEnumerable<DomainEvent> changes = ((IAggregate)original).GetUncommittedEvents();
 
-                var snapshot = ((IAggregate)portfolio).GetSnapshot();
+                Portfolio copy = ActivatorHelper.CreateInstanceUsingNonPublicConstructor<Portfolio>(original.Identity);
+                ((IAggregate)copy).LoadFromHistory(changes);
+                original.CreditAccount(AccountType.Cheque, Money.Amount(5));
 
-                IAggregate copy = ActivatorHelper.CreateInstanceUsingNonPublicConstructor<Portfolio>(snapshot.Identity);
-                copy.RestoreSnapshot(snapshot);
+                var copyBalance = copy.GetAccountBalance(AccountType.Cheque);
+                var originalBalance = original.GetAccountBalance(AccountType.Cheque);
 
-                IAggregate copy2 = ActivatorHelper.CreateInstanceUsingNonPublicConstructor<Portfolio>(snapshot.Identity);
-                copy2.LoadFromHistory(((IAggregate)portfolio).GetUncommittedEvents());
+                if (originalBalance == copyBalance)
+                {
+                    throw new Exception("Balances should not match");
+                }
 
-                portfolio.DebitAccount(AccountType.Cheque, Money.Amount(500));
+                if (original != copy)
+                {
+                    throw new Exception("Aggregates should match by identity");
+                }
             }
             catch (Exception ex)
             {

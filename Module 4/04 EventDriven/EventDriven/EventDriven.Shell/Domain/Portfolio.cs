@@ -16,14 +16,14 @@ namespace EventDriven.Shell.Domain
             accounts = new HashSet<Account>();
         }
 
-        public static Portfolio Create(AccountType accountType, Money initialDeposit)
+        public static Portfolio Open(PortfolioId id, AccountType accountType, Money initialDeposit)
         {
             if (initialDeposit < MinimumPortfolioBalance)
             {
                 throw new InvalidOperationException(String.Format("The intial deposit of {0} is lower than the require a minimum of {1}", initialDeposit, MinimumPortfolioBalance));
             }
 
-            var portfolio = new Portfolio(PortfolioId.GenerateId());
+            var portfolio = new Portfolio(id);
             portfolio.RaiseEvent(new PortfolioOpened());
             portfolio.OpenAccount(accountType);
             portfolio.CreditAccount(accountType, initialDeposit);

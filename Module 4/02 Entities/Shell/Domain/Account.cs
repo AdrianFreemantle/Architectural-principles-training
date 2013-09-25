@@ -8,7 +8,7 @@ namespace Shell.Domain
     {
         readonly List<Transaction> transactions;
  
-        public Account(LedgerId identity)
+        public Account(AccountId identity)
             : base(identity)
         {
             transactions = new List<Transaction>();

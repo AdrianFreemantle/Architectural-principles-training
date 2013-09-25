@@ -3,9 +3,9 @@ using Entities;
 
 namespace Shell.Domain
 {
-    public class LedgerId : Identity<Guid>
+    public class AccountId : Identity<Guid>
     {
-        public LedgerId(Guid id)
+        public AccountId(Guid id)
             : base(id)
         {
         }
