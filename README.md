@@ -37,7 +37,7 @@ Clientele Training
 * Test Driven Development
 * Behaviour Driven Development
 
-### Module 5 – Domain Driven Design
+### Module 5 â€“ Domain Driven Design (TBC)
 * Ubiquitous Language
 * Domains and Subdomains
 * Architecture
@@ -53,7 +53,7 @@ Clientele Training
 * CQRS
 * Event Sourcing
 
-### Module 6 – Software Project Management
+### Module 6 â€“ Software Project Management (TBC)
 * The Software Development Life Cycle
 * Overview of Project Planning
 * Development Methodologies
